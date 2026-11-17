@@ -25,7 +25,7 @@ def index():
             return redirect(url_for("staff.dashboard"))
 
     campus_name = SystemSetting.get_value(
-        "campus_name", "Central University Campus"
+        "campus_name", "Bennett University"
     )
     return render_template("index.html", campus_name=campus_name)
 

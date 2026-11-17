@@ -180,7 +180,7 @@ def settings():
             "maintenance_portal_url", "https://maintenance.campus.edu"
         )
         form.campus_name.data = SystemSetting.get_value(
-            "campus_name", "Central University Campus"
+            "campus_name", "Bennett University"
         )
 
     if form.validate_on_submit():

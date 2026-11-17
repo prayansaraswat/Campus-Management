@@ -53,7 +53,7 @@ def create_app(config_name: str = None) -> Flask:
         return {
             "unread_notifications_count": unread_count,
             "campus_name": SystemSetting.get_value(
-                "campus_name", "Central University Campus"
+                "campus_name", "Bennett University"
             ),
             "maintenance_portal_url": SystemSetting.get_value(
                 "maintenance_portal_url", "https://maintenance.campus.edu"

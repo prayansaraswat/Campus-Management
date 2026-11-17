@@ -47,7 +47,7 @@ def seed_database():
         )
         SystemSetting.set_value(
             "campus_name",
-            "Central University Campus",
+            "Bennett University",
             "Campus institution display name",
         )
 

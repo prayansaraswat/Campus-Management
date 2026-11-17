@@ -19,7 +19,7 @@ class Config:
     DEFAULT_MAINTENANCE_URL = os.environ.get(
         "MAINTENANCE_PORTAL_URL", "https://maintenance.campus.edu"
     )
-    CAMPUS_NAME = os.environ.get("CAMPUS_NAME", "Central University Campus")
+    CAMPUS_NAME = os.environ.get("CAMPUS_NAME", "Bennett University")
 
 
 class DevelopmentConfig(Config):
