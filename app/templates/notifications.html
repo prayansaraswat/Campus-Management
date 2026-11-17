@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Notifications - Campus Portal{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-9">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h3 class="fw-bold mb-1"><i class="bi bi-bell-fill text-primary me-2"></i> Notifications</h3>
+        <p class="text-muted small mb-0">Updates on your concerns, comments, and appointment bookings.</p>
+      </div>
+      {% if notifications %}
+        <form method="POST" action="{{ url_for('main.read_all_notifications') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-check2-all me-1"></i> Mark All as Read
+          </button>
+        </form>
+      {% endif %}
+    </div>
+
+    {% if notifications %}
+      <div class="list-group shadow-sm border-0 rounded-3">
+        {% for notif in notifications %}
+          <div class="list-group-item p-3 border-0 border-bottom {% if not notif.is_read %}bg-light border-start border-primary border-4{% endif %}">
+            <div class="d-flex w-100 justify-content-between align-items-start">
+              <div>
+                <h6 class="mb-1 fw-bold {% if not notif.is_read %}text-primary{% else %}text-dark{% endif %}">
+                  {% if not notif.is_read %}
+                    <span class="badge bg-primary me-1">New</span>
+                  {% endif %}
+                  {{ notif.title }}
+                </h6>
+                <p class="mb-1 text-muted small">{{ notif.message }}</p>
+                <small class="text-secondary"><i class="bi bi-clock me-1"></i> {{ notif.created_at|timeago }}</small>
+              </div>
+              <div class="d-flex gap-2 align-items-center">
+                {% if notif.link %}
+                  <a href="{{ notif.link }}" class="btn btn-sm btn-outline-primary">
+                    View
+                  </a>
+                {% endif %}
+                {% if not notif.is_read %}
+                  <form method="POST" action="{{ url_for('main.mark_read', notification_id=notif.id) }}" class="d-inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-sm btn-link text-muted p-0" title="Mark as read">
+                      <i class="bi bi-check-circle"></i>
+                    </button>
+                  </form>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="card p-5 text-center border-0 shadow-sm rounded-4">
+        <i class="bi bi-bell-slash text-muted fs-1 mb-2"></i>
+        <h5 class="text-muted">No notifications yet</h5>
+        <p class="small text-muted mb-0">You're all caught up! New updates on your concerns and appointments will appear here.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

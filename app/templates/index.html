@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block title %}Welcome - Campus Student Support and Concern Portal{% endblock %}
+
+{% block content %}
+<div class="row align-items-center py-5">
+  <div class="col-lg-7 mb-4 mb-lg-0">
+    <span class="badge bg-primary px-3 py-2 rounded-pill mb-3">University Concern Management System</span>
+    <h1 class="display-4 fw-bold text-dark lh-sm mb-3">
+      Transparent, responsive student support across campus.
+    </h1>
+    <p class="lead text-muted mb-4">
+      Submit your academic, mess, residential, and campus concerns directly to the right university authorities. 
+      Track your concern's progress in real-time, book cabin appointments, and access dedicated confidential wellbeing care.
+    </p>
+    <div class="d-flex flex-wrap gap-2">
+      <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg px-4 shadow-sm">
+        <i class="bi bi-person-plus-fill me-1"></i> Student Register
+      </a>
+      <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary btn-lg px-4">
+        <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
+      </a>
+      <a href="{{ url_for('main.directory') }}" class="btn btn-outline-secondary btn-lg px-4">
+        <i class="bi bi-person-lines-fill me-1"></i> Who do I contact?
+      </a>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card border-0 shadow-lg rounded-4 p-4 bg-white">
+      <h5 class="fw-bold mb-3 d-flex align-items-center gap-2 text-primary">
+        <i class="bi bi-key-fill text-warning"></i> Demo Accounts (One-Click)
+      </h5>
+      <p class="small text-muted mb-3">
+        Test the portal immediately using any of the seeded demo personas. Standard password is: <code class="fw-bold">Password123!</code>
+      </p>
+
+      <div class="list-group list-group-flush small">
+        <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+          <div>
+            <strong class="text-dark">Alex Rivera</strong> <span class="badge bg-secondary ms-1">Student</span>
+            <div class="text-muted font-monospace">student@campus.edu</div>
+          </div>
+          <span class="badge bg-light text-dark border">Raises concerns</span>
+        </div>
+        <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+          <div>
+            <strong class="text-dark">Dr. Sarah Vance</strong> <span class="badge bg-info ms-1">Mentor</span>
+            <div class="text-muted font-monospace">mentor@campus.edu</div>
+          </div>
+          <span class="badge bg-light text-dark border">Academic</span>
+        </div>
+        <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+          <div>
+            <strong class="text-dark">Prof. Alan Turing</strong> <span class="badge bg-primary ms-1">Coordinator</span>
+            <div class="text-muted font-monospace">coordinator@campus.edu</div>
+          </div>
+          <span class="badge bg-light text-dark border">Exams/Results</span>
+        </div>
+        <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+          <div>
+            <strong class="text-dark">Col. James Wilson</strong> <span class="badge bg-dark ms-1">Warden</span>
+            <div class="text-muted font-monospace">warden@campus.edu</div>
+          </div>
+          <span class="badge bg-light text-dark border">Hostel / Mess</span>
+        </div>
+        <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+          <div>
+            <strong class="text-dark">Dr. Grace Hopper</strong> <span class="badge bg-purple ms-1" style="background-color: #7c3aed; color: #fff;">Wellbeing Staff</span>
+            <div class="text-muted font-monospace">wellbeing@campus.edu</div>
+          </div>
+          <span class="badge bg-light text-dark border">Confidential</span>
+        </div>
+        <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+          <div>
+            <strong class="text-dark">Dean Robert Hayes</strong> <span class="badge bg-success ms-1">Dean SA</span>
+            <div class="text-muted font-monospace">dean_sa@campus.edu</div>
+          </div>
+          <span class="badge bg-light text-dark border">Escalations</span>
+        </div>
+        <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+          <div>
+            <strong class="text-dark">System Admin</strong> <span class="badge bg-danger ms-1">Admin</span>
+            <div class="text-muted font-monospace">admin@campus.edu</div>
+          </div>
+          <span class="badge bg-light text-dark border">Full Rules/Config</span>
+        </div>
+      </div>
+
+      <div class="mt-3 text-center">
+        <a href="{{ url_for('auth.login') }}" class="btn btn-primary w-100 fw-semibold">
+          Sign In with Demo Credentials
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Key Architectural Capabilities -->
+<div class="row g-4 py-4 border-top">
+  <div class="col-12 text-center mb-2">
+    <h3 class="fw-bold text-dark">Engineered for University Support Workflows</h3>
+    <p class="text-muted">Built according to student discovery insights and campus governance protocols.</p>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card h-100 p-3 border-0 shadow-sm rounded-3">
+      <div class="card-body">
+        <div class="fs-2 text-primary mb-2"><i class="bi bi-signpost-split-fill"></i></div>
+        <h5 class="fw-bold">Database-Driven Routing</h5>
+        <p class="text-muted small">
+          Concerns are automatically routed according to an admin-editable database routing table, avoiding hardcoded assumptions.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card h-100 p-3 border-0 shadow-sm rounded-3">
+      <div class="card-body">
+        <div class="fs-2 text-success mb-2"><i class="bi bi-shield-lock-fill"></i></div>
+        <h5 class="fw-bold">Confidential Wellbeing Route</h5>
+        <p class="text-muted small">
+          Wellbeing concerns are strictly restricted on the server to the student and authorized Wellbeing Staff, completely hidden from other staff and admin dashboards.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card h-100 p-3 border-0 shadow-sm rounded-3">
+      <div class="card-body">
+        <div class="fs-2 text-warning mb-2"><i class="bi bi-arrow-up-right-circle-fill"></i></div>
+        <h5 class="fw-bold">Escalation & Overdue SLA</h5>
+        <p class="text-muted small">
+          Staff can escalate unresolvable concerns to higher authorities along configurable chains. Concerns unacknowledged past the limit are flagged overdue.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card h-100 p-3 border-0 shadow-sm rounded-3">
+      <div class="card-body">
+        <div class="fs-2 text-info mb-2"><i class="bi bi-calendar-check-fill"></i></div>
+        <h5 class="fw-bold">Cabin Slots & Appointments</h5>
+        <p class="text-muted small">
+          Staff publish their cabin hours and availability slots. Students book slots directly without wasting time checking empty offices.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card h-100 p-3 border-0 shadow-sm rounded-3">
+      <div class="card-body">
+        <div class="fs-2 text-secondary mb-2"><i class="bi bi-tools"></i></div>
+        <h5 class="fw-bold">Non-Duplication of Facilities</h5>
+        <p class="text-muted small">
+          Maintenance and housekeeping requests are guided straight to the existing university maintenance portal without duplicate ticket pipelines.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card h-100 p-3 border-0 shadow-sm rounded-3">
+      <div class="card-body">
+        <div class="fs-2 text-danger mb-2"><i class="bi bi-bell-fill"></i></div>
+        <h5 class="fw-bold">Transparent Notifications</h5>
+        <p class="text-muted small">
+          Students and staff receive in-app notifications whenever status updates, comments, or appointment actions occur.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

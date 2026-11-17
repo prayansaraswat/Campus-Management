@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+{% block title %}Student Dashboard - Campus Portal{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+  <div class="col-md-8">
+    <h2 class="fw-bold mb-1">Welcome, {{ current_user.name }}</h2>
+    <p class="text-muted mb-0">
+      <i class="bi bi-mortarboard me-1"></i> Student Portal &bull; {{ current_user.department or 'General Studies' }}
+    </p>
+  </div>
+  <div class="col-md-4 text-md-end mt-3 mt-md-0 d-flex gap-2 justify-content-md-end">
+    <a href="{{ url_for('student.submit_concern') }}" class="btn btn-primary fw-semibold shadow-sm">
+      <i class="bi bi-plus-circle-fill me-1"></i> Raise Concern
+    </a>
+    <a href="{{ url_for('student.book_appointment') }}" class="btn btn-outline-primary fw-semibold">
+      <i class="bi bi-calendar-plus me-1"></i> Book Appointment
+    </a>
+  </div>
+</div>
+
+<!-- Key Stat Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card card-stat p-3 bg-white border">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <span class="text-muted small fw-semibold">Active Concerns</span>
+          <h3 class="fw-bold text-primary mb-0 mt-1">{{ active_concerns|length }}</h3>
+        </div>
+        <div class="fs-1 text-primary opacity-50"><i class="bi bi-hourglass-split"></i></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card card-stat p-3 bg-white border">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <span class="text-muted small fw-semibold">Resolved Concerns</span>
+          <h3 class="fw-bold text-success mb-0 mt-1">{{ resolved_concerns|length }}</h3>
+        </div>
+        <div class="fs-1 text-success opacity-50"><i class="bi bi-check-circle-fill"></i></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card card-stat p-3 bg-white border">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <span class="text-muted small fw-semibold">Booked Appointments</span>
+          <h3 class="fw-bold text-info mb-0 mt-1">{{ all_appointments_count }}</h3>
+        </div>
+        <div class="fs-1 text-info opacity-50"><i class="bi bi-calendar2-check-fill"></i></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Concerns List -->
+  <div class="col-lg-8">
+    <div class="card shadow-sm border-0 rounded-3">
+      <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-card-list text-primary me-2"></i> My Submitted Concerns</h5>
+        <span class="badge bg-light text-dark border">{{ all_concerns_count }} Total</span>
+      </div>
+      <div class="card-body p-0">
+        {% if concerns %}
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light small">
+                <tr>
+                  <th>Tracking #</th>
+                  <th>Category</th>
+                  <th>Title</th>
+                  <th>Urgency</th>
+                  <th>Status</th>
+                  <th>Routed To</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for concern in concerns %}
+                  <tr>
+                    <td>
+                      <a href="{{ url_for('student.view_concern', concern_id=concern.id) }}" class="fw-bold text-decoration-none">
+                        {{ concern.tracking_number }}
+                      </a>
+                    </td>
+                    <td>
+                      <span class="badge bg-light text-dark border">{{ concern.category }}</span>
+                      {% if concern.is_confidential %}
+                        <span class="badge bg-purple" style="background-color: #7c3aed; color: #fff;">Confidential</span>
+                      {% endif %}
+                    </td>
+                    <td class="text-truncate" style="max-width: 200px;">{{ concern.title }}</td>
+                    <td>
+                      <span class="badge badge-{{ concern.urgency|lower }}">{{ concern.urgency }}</span>
+                    </td>
+                    <td>
+                      {% if concern.status == 'Submitted' %}
+                        <span class="badge bg-secondary">{{ concern.status }}</span>
+                      {% elif concern.status == 'Acknowledged' %}
+                        <span class="badge bg-info text-dark">{{ concern.status }}</span>
+                      {% elif concern.status == 'In Progress' %}
+                        <span class="badge bg-primary">{{ concern.status }}</span>
+                      {% elif concern.status == 'Escalated' %}
+                        <span class="badge bg-warning text-dark">{{ concern.status }}</span>
+                      {% elif concern.status in ['Resolved', 'Closed'] %}
+                        <span class="badge bg-success">{{ concern.status }}</span>
+                      {% endif %}
+                    </td>
+                    <td class="small text-muted">{{ concern.assigned_role }}</td>
+                    <td>
+                      <a href="{{ url_for('student.view_concern', concern_id=concern.id) }}" class="btn btn-sm btn-outline-primary py-0 px-2">
+                        View
+                      </a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="text-center py-5">
+            <i class="bi bi-chat-left-dots text-muted fs-1 mb-2"></i>
+            <h6 class="text-muted">No concerns raised yet.</h6>
+            <p class="small text-muted mb-3">If you have an issue with academics, mess, hostel, or exams, submit a concern.</p>
+            <a href="{{ url_for('student.submit_concern') }}" class="btn btn-primary btn-sm">
+              <i class="bi bi-plus-circle me-1"></i> Submit Your First Concern
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Appointments & Directory Quick Links -->
+  <div class="col-lg-4">
+    <div class="card shadow-sm border-0 rounded-3 mb-4">
+      <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+        <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-calendar-event text-info me-2"></i> Upcoming Appointments</h6>
+        <a href="{{ url_for('student.appointments') }}" class="small text-decoration-none">View All</a>
+      </div>
+      <div class="card-body p-3">
+        {% if appointments %}
+          <div class="list-group list-group-flush small">
+            {% for appt in appointments %}
+              <div class="list-group-item px-0 py-2">
+                <div class="d-flex justify-content-between align-items-start">
+                  <strong>{{ appt.staff.name }}</strong>
+                  <span class="badge {% if appt.status == 'Approved' %}bg-success{% elif appt.status == 'Declined' %}bg-danger{% elif appt.status == 'Rescheduled' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                    {{ appt.status }}
+                  </span>
+                </div>
+                <div class="text-muted">{{ appt.staff.role }} &bull; {{ appt.purpose }}</div>
+                {% if appt.slot %}
+                  <div class="small text-primary mt-1">
+                    <i class="bi bi-clock me-1"></i> {{ appt.slot.date|date_fmt }} ({{ appt.slot.start_time|time_fmt }} - {{ appt.slot.end_time|time_fmt }})
+                  </div>
+                {% elif appt.rescheduled_date %}
+                  <div class="small text-warning mt-1">
+                    <i class="bi bi-clock me-1"></i> Rescheduled: {{ appt.rescheduled_date|date_fmt }} ({{ appt.rescheduled_start_time|time_fmt }})
+                  </div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center py-4 text-muted small">
+            <i class="bi bi-calendar-x fs-2 mb-2 d-block"></i>
+            No appointments scheduled.
+            <div class="mt-2">
+              <a href="{{ url_for('student.book_appointment') }}" class="btn btn-sm btn-outline-primary">
+                Book a Slot
+              </a>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Quick Help & Maintenance Card -->
+    <div class="card shadow-sm border-0 rounded-3 bg-light">
+      <div class="card-body p-3">
+        <h6 class="fw-bold text-dark mb-2"><i class="bi bi-tools text-primary me-2"></i> Facilities & Repairs</h6>
+        <p class="small text-muted mb-2">
+          Hostel room electrical faults, plumbing, or carpenter repairs are handled directly by the Maintenance Portal.
+        </p>
+        <a href="{{ url_for('main.maintenance') }}" class="btn btn-outline-secondary btn-sm w-100">
+          <i class="bi bi-box-arrow-up-right me-1"></i> Maintenance Portal
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

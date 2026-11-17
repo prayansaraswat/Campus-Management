@@ -1,0 +1,227 @@
+/* Campus Student Support and Concern Portal Styles */
+
+:root {
+  --primary-color: #1e3a8a;
+  --primary-hover: #172554;
+  --secondary-color: #0d9488;
+  --accent-color: #f59e0b;
+  --danger-color: #dc2626;
+  --success-color: #16a34a;
+  --bg-subtle: #f8fafc;
+  --card-border: #e2e8f0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--bg-subtle);
+  color: #1e293b;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+/* Navbar */
+.navbar-custom {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.navbar-custom .navbar-brand {
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: #ffffff;
+}
+
+.navbar-custom .nav-link {
+  color: rgba(255, 255, 255, 0.88);
+  font-weight: 500;
+  transition: color 0.2s ease-in-out;
+}
+
+.navbar-custom .nav-link:hover,
+.navbar-custom .nav-link.active {
+  color: #ffffff;
+}
+
+/* Badges */
+.badge-role {
+  font-size: 0.75rem;
+  padding: 0.35em 0.65em;
+  font-weight: 600;
+  border-radius: 9999px;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.badge-urgent {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #f87171;
+}
+
+.badge-high {
+  background-color: #ffedd5;
+  color: #9a3412;
+  border: 1px solid #fb923c;
+}
+
+.badge-medium {
+  background-color: #fef9c3;
+  color: #854d0e;
+  border: 1px solid #facc15;
+}
+
+.badge-low {
+  background-color: #e0f2fe;
+  color: #075985;
+  border: 1px solid #7dd3fc;
+}
+
+.badge-overdue {
+  background-color: #ef4444;
+  color: #ffffff;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Cards */
+.card-stat {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card-stat:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+/* Progress Stepper for Concerns */
+.timeline-stepper {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  margin: 2rem 0;
+}
+
+.timeline-stepper::before {
+  content: "";
+  position: absolute;
+  top: 24px;
+  left: 30px;
+  right: 30px;
+  height: 4px;
+  background-color: #e2e8f0;
+  z-index: 1;
+}
+
+.stepper-step {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  flex: 1;
+}
+
+.step-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  border: 3px solid #cbd5e1;
+  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.stepper-step.completed .step-icon {
+  background-color: #16a34a;
+  border-color: #16a34a;
+  color: #ffffff;
+}
+
+.stepper-step.active .step-icon {
+  background-color: #1e3a8a;
+  border-color: #1e3a8a;
+  color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.2);
+}
+
+.stepper-step.escalated .step-icon {
+  background-color: #d97706;
+  border-color: #d97706;
+  color: #ffffff;
+}
+
+.step-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.stepper-step.active .step-title,
+.stepper-step.completed .step-title {
+  color: #1e293b;
+}
+
+/* Timeline Activity Stream */
+.activity-stream {
+  position: relative;
+  padding-left: 28px;
+}
+
+.activity-stream::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  bottom: 0;
+  left: 9px;
+  width: 2px;
+  background-color: #cbd5e1;
+}
+
+.activity-item {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.activity-item::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: -24px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #1e3a8a;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 2px #cbd5e1;
+}
+
+/* Confidential Banner */
+.confidential-banner {
+  background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 100%);
+  color: #ffffff;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Maintenance Banner */
+.maintenance-card {
+  border-left: 5px solid #0284c7;
+  background-color: #f0f9ff;
+}

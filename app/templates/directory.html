@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% block title %}Who Do I Contact? - Staff Directory{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+  <div class="col-12">
+    <h2 class="fw-bold mb-1"><i class="bi bi-person-lines-fill text-primary me-2"></i> Who Do I Contact?</h2>
+    <p class="text-muted">
+      Select your concern category to find the responsible campus authority, their cabin office location, and published availability slots.
+    </p>
+  </div>
+</div>
+
+<!-- Category Tabs / Selector -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="d-flex flex-wrap gap-2 p-2 bg-white rounded-3 shadow-sm border">
+      {% for cat in categories %}
+        <a href="{{ url_for('main.directory', category=cat) }}" 
+           class="btn btn-sm {% if cat == selected_category %}btn-primary fw-semibold{% else %}btn-outline-secondary{% endif %}">
+          {% if cat == 'Academic' %}<i class="bi bi-journal-bookmark me-1"></i>
+          {% elif cat == 'Examination/Results' %}<i class="bi bi-file-earmark-text me-1"></i>
+          {% elif cat == 'Mess' %}<i class="bi bi-cup-hot me-1"></i>
+          {% elif cat == 'Residential' %}<i class="bi bi-houses me-1"></i>
+          {% elif cat == 'Wellbeing' %}<i class="bi bi-heart-pulse me-1"></i>
+          {% elif cat == 'Maintenance/Housekeeping' %}<i class="bi bi-tools me-1"></i>
+          {% else %}<i class="bi bi-question-circle me-1"></i>{% endif %}
+          {{ cat }}
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% if is_maintenance %}
+  <!-- Maintenance / Housekeeping Redirect Notice -->
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+      <div class="card shadow-sm border-0 rounded-4 maintenance-card p-4">
+        <div class="d-flex align-items-start gap-3">
+          <div class="fs-1 text-primary"><i class="bi bi-tools"></i></div>
+          <div>
+            <h4 class="fw-bold text-primary mb-2">Campus Maintenance & Housekeeping Portal</h4>
+            <p class="text-muted mb-3">
+              The university operates a dedicated, specialized facility portal for electrical faults, plumbing, carpentry, 
+              room repairs, and hostel housekeeping requests. To ensure rapid response by campus technicians without duplicating tickets, 
+              these requests are handled directly by the Estate & Facilities Office.
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+              <a href="{{ maintenance_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary px-4">
+                <i class="bi bi-box-arrow-up-right me-1"></i> Open Facilities Portal
+              </a>
+              <a href="{{ url_for('main.maintenance') }}" class="btn btn-outline-secondary px-3">
+                Learn More About Facility Requests
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% else %}
+  <!-- Directory Responsible Role and Staff -->
+  <div class="row mb-3 align-items-center">
+    <div class="col-md-8">
+      <div class="d-flex align-items-center gap-2">
+        <span class="fs-5 text-muted">Responsible Role:</span>
+        <span class="badge bg-primary fs-6 px-3 py-2">{{ target_role }}</span>
+      </div>
+    </div>
+    <div class="col-md-4 text-md-end mt-2 mt-md-0">
+      {% if current_user.is_authenticated and current_user.is_student %}
+        <a href="{{ url_for('student.submit_concern') }}?category={{ selected_category }}" class="btn btn-warning fw-semibold shadow-sm">
+          <i class="bi bi-plus-circle me-1"></i> Submit Concern in {{ selected_category }}
+        </a>
+      {% else %}
+        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary btn-sm">
+          Sign In to Submit Concern
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if selected_category == 'Wellbeing' %}
+    <div class="confidential-banner d-flex align-items-center gap-3">
+      <i class="bi bi-shield-lock-fill fs-2"></i>
+      <div>
+        <strong>Confidential Route:</strong> Wellbeing concerns submitted to Wellbeing/Health Staff are completely private.
+        Only you and certified health counselors can view details.
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="row g-4">
+    {% if staff_members %}
+      {% for staff in staff_members %}
+        <div class="col-lg-6">
+          <div class="card h-100 shadow-sm border-0 rounded-3">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                  <h5 class="fw-bold mb-1 text-dark">{{ staff.name }}</h5>
+                  <span class="badge bg-secondary">{{ staff.role }}</span>
+                  {% if staff.department %}
+                    <span class="badge bg-light text-dark border ms-1">{{ staff.department }}</span>
+                  {% endif %}
+                </div>
+                <div class="text-primary fs-3"><i class="bi bi-person-badge"></i></div>
+              </div>
+
+              <ul class="list-unstyled text-muted small mb-3">
+                <li class="mb-1">
+                  <i class="bi bi-geo-alt-fill text-danger me-2"></i>
+                  <strong>Office / Cabin:</strong> {{ staff.cabin_location or 'Main Administration Block' }}
+                </li>
+                <li class="mb-1">
+                  <i class="bi bi-envelope-fill text-primary me-2"></i>
+                  <strong>Email:</strong> {{ staff.email }}
+                </li>
+                {% if staff.phone %}
+                  <li class="mb-1">
+                    <i class="bi bi-telephone-fill text-success me-2"></i>
+                    <strong>Phone / Ext:</strong> {{ staff.phone }}
+                  </li>
+                {% endif %}
+              </ul>
+
+              <!-- Published Availability Slots -->
+              <h6 class="fw-bold small text-uppercase text-secondary mb-2">Published Availability Slots</h6>
+              {% set slots = slots_by_staff.get(staff.id, []) %}
+              {% if slots %}
+                <div class="table-responsive">
+                  <table class="table table-sm table-bordered align-middle mb-2 small">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Location</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for slot in slots %}
+                        <tr>
+                          <td>{{ slot.date|date_fmt }}</td>
+                          <td>{{ slot.start_time|time_fmt }} - {{ slot.end_time|time_fmt }}</td>
+                          <td>{{ slot.location }}</td>
+                          <td>
+                            {% if current_user.is_authenticated and current_user.is_student %}
+                              <a href="{{ url_for('student.book_appointment', staff_id=staff.id, slot_id=slot.id) }}" 
+                                 class="btn btn-primary btn-xs py-0 px-2 small">
+                                Book
+                              </a>
+                            {% else %}
+                              <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary btn-xs py-0 px-2 small">
+                                Sign in
+                              </a>
+                            {% endif %}
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              {% else %}
+                <div class="alert alert-light border small text-muted py-2 mb-2">
+                  <i class="bi bi-info-circle me-1"></i> No public slots posted yet. You can request an ad-hoc appointment.
+                </div>
+              {% endif %}
+
+              {% if current_user.is_authenticated and current_user.is_student %}
+                <a href="{{ url_for('student.book_appointment', staff_id=staff.id) }}" class="btn btn-outline-primary btn-sm w-100 mt-2">
+                  <i class="bi bi-calendar-plus me-1"></i> Request Appointment with {{ staff.name }}
+                </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="col-12">
+        <div class="card p-5 text-center border-0 shadow-sm rounded-3">
+          <i class="bi bi-info-circle text-muted fs-1 mb-2"></i>
+          <h5 class="text-muted">No staff members currently active for this role.</h5>
+          <p class="small text-muted mb-0">Contact the Campus Administrator or Dean of Student Affairs for assistance.</p>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+{% endif %}
+{% endblock %}

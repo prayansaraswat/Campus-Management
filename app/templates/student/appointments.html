@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}My Appointments - Campus Portal{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+  <div class="col-md-8">
+    <h3 class="fw-bold mb-1"><i class="bi bi-calendar2-check-fill text-primary me-2"></i> My Cabin Appointments</h3>
+    <p class="text-muted small mb-0">View the status of your booked slots and meeting requests with university staff.</p>
+  </div>
+  <div class="col-md-4 text-md-end mt-2 mt-md-0">
+    <a href="{{ url_for('student.book_appointment') }}" class="btn btn-primary btn-sm fw-semibold shadow-sm">
+      <i class="bi bi-calendar-plus me-1"></i> Request New Appointment
+    </a>
+  </div>
+</div>
+
+{% if appointments %}
+  <div class="card shadow-sm border-0 rounded-4 bg-white">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light small">
+          <tr>
+            <th>Staff Contact</th>
+            <th>Role & Location</th>
+            <th>Scheduled Slot</th>
+            <th>Purpose</th>
+            <th>Status</th>
+            <th>Notes / Feedback</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for appt in appointments %}
+            <tr>
+              <td>
+                <strong class="text-dark">{{ appt.staff.name }}</strong>
+                <div class="text-muted small">{{ appt.staff.email }}</div>
+              </td>
+              <td>
+                <span class="badge bg-secondary">{{ appt.staff.role }}</span>
+                <div class="text-muted small mt-1">
+                  <i class="bi bi-geo-alt me-1"></i> {{ appt.staff.cabin_location or 'Main Block' }}
+                </div>
+              </td>
+              <td>
+                {% if appt.slot %}
+                  <div class="fw-semibold text-primary">
+                    <i class="bi bi-calendar me-1"></i> {{ appt.slot.date|date_fmt }}
+                  </div>
+                  <div class="small text-muted">
+                    {{ appt.slot.start_time|time_fmt }} - {{ appt.slot.end_time|time_fmt }}
+                  </div>
+                {% elif appt.rescheduled_date %}
+                  <div class="fw-semibold text-warning">
+                    <i class="bi bi-arrow-repeat me-1"></i> Proposed New Time:
+                  </div>
+                  <div class="small text-dark fw-bold">
+                    {{ appt.rescheduled_date|date_fmt }} at {{ appt.rescheduled_start_time|time_fmt }} - {{ appt.rescheduled_end_time|time_fmt }}
+                  </div>
+                {% else %}
+                  <span class="text-muted small">Ad-hoc request</span>
+                {% endif %}
+              </td>
+              <td class="small" style="max-width: 250px;">
+                {{ appt.purpose }}
+                {% if appt.concern %}
+                  <div class="mt-1">
+                    <a href="{{ url_for('student.view_concern', concern_id=appt.concern.id) }}" class="badge bg-light text-primary border text-decoration-none">
+                      Ref: #{{ appt.concern.tracking_number }}
+                    </a>
+                  </div>
+                {% endif %}
+              </td>
+              <td>
+                {% if appt.status == 'Approved' %}
+                  <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Approved</span>
+                {% elif appt.status == 'Declined' %}
+                  <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i> Declined</span>
+                {% elif appt.status == 'Rescheduled' %}
+                  <span class="badge bg-warning text-dark"><i class="bi bi-arrow-repeat me-1"></i> Rescheduled</span>
+                {% elif appt.status == 'Completed' %}
+                  <span class="badge bg-secondary"><i class="bi bi-check-all me-1"></i> Completed</span>
+                {% else %}
+                  <span class="badge bg-primary"><i class="bi bi-hourglass me-1"></i> Requested</span>
+                {% endif %}
+              </td>
+              <td class="small text-muted">
+                {{ appt.staff_notes or '-' }}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% else %}
+  <div class="card p-5 text-center border-0 shadow-sm rounded-4">
+    <i class="bi bi-calendar-x text-muted fs-1 mb-2"></i>
+    <h5 class="text-muted">No appointments requested yet</h5>
+    <p class="small text-muted mb-3">You can view staff cabin slots in the directory and request a meeting.</p>
+    <div>
+      <a href="{{ url_for('main.directory') }}" class="btn btn-outline-secondary btn-sm me-2">
+        <i class="bi bi-person-lines-fill me-1"></i> Staff Directory
+      </a>
+      <a href="{{ url_for('student.book_appointment') }}" class="btn btn-primary btn-sm">
+        <i class="bi bi-calendar-plus me-1"></i> Book Slot
+      </a>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}

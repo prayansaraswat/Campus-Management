@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Book Appointment - Campus Portal{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-3">
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+      <div class="d-flex align-items-center gap-3 mb-4">
+        <div class="fs-2 text-primary"><i class="bi bi-calendar-plus"></i></div>
+        <div>
+          <h3 class="fw-bold mb-0">Book Cabin Appointment</h3>
+          <p class="text-muted small mb-0">
+            Select a staff member and their published availability slot to request a meeting.
+          </p>
+        </div>
+      </div>
+
+      <form method="POST" action="{{ url_for('student.book_appointment') }}">
+        {{ form.hidden_tag() }}
+
+        <div class="mb-3">
+          {{ form.staff_id.label(class="form-label fw-semibold small") }}
+          {{ form.staff_id(class="form-select" + (" is-invalid" if form.staff_id.errors else "")) }}
+          {% for error in form.staff_id.errors %}
+            <div class="invalid-feedback">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="mb-3">
+          {{ form.slot_id.label(class="form-label fw-semibold small") }}
+          {{ form.slot_id(class="form-select" + (" is-invalid" if form.slot_id.errors else "")) }}
+          {% for error in form.slot_id.errors %}
+            <div class="invalid-feedback">{{ error }}</div>
+          {% endfor %}
+          <div class="form-text small">
+            Choose an available slot, or select 'No specific slot' to propose an ad-hoc meeting in the purpose notes.
+          </div>
+        </div>
+
+        <div class="mb-3">
+          {{ form.concern_id.label(class="form-label fw-semibold small") }}
+          {{ form.concern_id(class="form-select" + (" is-invalid" if form.concern_id.errors else "")) }}
+          {% for error in form.concern_id.errors %}
+            <div class="invalid-feedback">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="mb-4">
+          {{ form.purpose.label(class="form-label fw-semibold small") }}
+          {{ form.purpose(class="form-control" + (" is-invalid" if form.purpose.errors else "")) }}
+          {% for error in form.purpose.errors %}
+            <div class="invalid-feedback">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center border-top pt-3">
+          <a href="{{ url_for('student.appointments') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Cancel
+          </a>
+          <button type="submit" class="btn btn-primary px-4 fw-semibold">
+            <i class="bi bi-calendar-check me-1"></i> Submit Request
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}Manage Escalation Chains - Campus Portal{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+  <div class="col-md-8">
+    <h3 class="fw-bold mb-1"><i class="bi bi-arrow-up-right-circle-fill text-warning me-2"></i> Configurable Escalation Chains</h3>
+    <p class="text-muted small mb-0">Define escalation paths from current roles to next-level university authorities.</p>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Add Escalation Rule Form -->
+  <div class="col-lg-5">
+    <div class="card shadow-sm border-0 rounded-4 p-4 bg-white">
+      <h5 class="fw-bold text-dark mb-3"><i class="bi bi-plus-circle-fill text-warning me-2"></i> Add Escalation Rule</h5>
+
+      <form method="POST" action="{{ url_for('admin.escalation_rules') }}">
+        {{ form.hidden_tag() }}
+
+        <div class="mb-3">
+          {{ form.current_role.label(class="form-label small fw-semibold") }}
+          {{ form.current_role(class="form-select" + (" is-invalid" if form.current_role.errors else "")) }}
+          {% for error in form.current_role.errors %}
+            <div class="invalid-feedback">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="mb-3">
+          {{ form.next_role.label(class="form-label small fw-semibold") }}
+          {{ form.next_role(class="form-select" + (" is-invalid" if form.next_role.errors else "")) }}
+          {% for error in form.next_role.errors %}
+            <div class="invalid-feedback">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="row g-2 mb-3">
+          <div class="col-md-7">
+            {{ form.category.label(class="form-label small fw-semibold") }}
+            {{ form.category(class="form-select" + (" is-invalid" if form.category.errors else "")) }}
+            {% for error in form.category.errors %}
+              <div class="invalid-feedback">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <div class="col-md-5">
+            {{ form.order_level.label(class="form-label small fw-semibold") }}
+            {{ form.order_level(class="form-control" + (" is-invalid" if form.order_level.errors else ""), type="number") }}
+            {% for error in form.order_level.errors %}
+              <div class="invalid-feedback">{{ error }}</div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          {{ form.description.label(class="form-label small fw-semibold") }}
+          {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else "")) }}
+          {% for error in form.description.errors %}
+            <div class="invalid-feedback">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="form-check form-switch mb-4">
+          {{ form.is_active(class="form-check-input", id="escalationActiveSwitch") }}
+          {{ form.is_active.label(class="form-check-label small fw-semibold", for="escalationActiveSwitch") }}
+        </div>
+
+        <button type="submit" class="btn btn-warning text-dark w-100 fw-bold">
+          <i class="bi bi-save me-1"></i> Save Escalation Rule
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Escalation Rules Listing -->
+  <div class="col-lg-7">
+    <div class="card shadow-sm border-0 rounded-4 bg-white">
+      <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0 text-dark">Configured Escalation Paths</h5>
+        <span class="badge bg-light text-dark border">{{ rules|length }} Paths</span>
+      </div>
+      <div class="card-body p-0">
+        {% if rules %}
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light small">
+                <tr>
+                  <th>Current Role</th>
+                  <th>Escalates To</th>
+                  <th>Category</th>
+                  <th>Level</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for rule in rules %}
+                  <tr>
+                    <td>
+                      <span class="badge bg-secondary">{{ rule.current_role }}</span>
+                    </td>
+                    <td>
+                      <i class="bi bi-arrow-right text-muted me-1"></i>
+                      <span class="badge bg-primary">{{ rule.next_role }}</span>
+                    </td>
+                    <td class="small">{{ rule.category or 'Global' }}</td>
+                    <td class="small text-muted">{{ rule.order_level }}</td>
+                    <td>
+                      <form method="POST" action="{{ url_for('admin.delete_escalation_rule', rule_id=rule.id) }}" class="d-inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-outline-danger btn-xs py-0 px-2 small" onclick="return confirm('Delete this escalation rule?');">
+                          Delete
+                        </button>
+                      </form>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="text-center py-5">
+            <i class="bi bi-arrow-up-right text-muted fs-1 mb-2"></i>
+            <h6 class="text-muted">No custom escalation paths configured.</h6>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

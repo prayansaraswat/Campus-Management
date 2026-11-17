@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% block title %}Manage Appointments - Campus Portal{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+  <div class="col-md-8">
+    <h3 class="fw-bold mb-1"><i class="bi bi-calendar-event text-primary me-2"></i> Student Appointment Requests</h3>
+    <p class="text-muted small mb-0">Approve, decline, reschedule, or complete meetings requested by students.</p>
+  </div>
+  <div class="col-md-4 text-md-end mt-2 mt-md-0">
+    <a href="{{ url_for('staff.availability') }}" class="btn btn-outline-primary btn-sm fw-semibold">
+      <i class="bi bi-clock-history me-1"></i> Manage Availability Slots
+    </a>
+  </div>
+</div>
+
+{% if appointments %}
+  <div class="card shadow-sm border-0 rounded-4 bg-white">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light small">
+          <tr>
+            <th>Student</th>
+            <th>Program / Contact</th>
+            <th>Requested Slot / Time</th>
+            <th>Purpose / Topic</th>
+            <th>Status</th>
+            <th>Staff Response</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for appt in appointments %}
+            <tr>
+              <td>
+                <strong class="text-dark">{{ appt.student.name }}</strong>
+                <div class="text-muted small">{{ appt.student.email }}</div>
+              </td>
+              <td class="small">
+                <div>{{ appt.student.department or 'General' }}</div>
+                <div class="text-muted">{{ appt.student.phone or '' }}</div>
+              </td>
+              <td>
+                {% if appt.slot %}
+                  <div class="fw-semibold text-primary">
+                    <i class="bi bi-calendar me-1"></i> {{ appt.slot.date|date_fmt }}
+                  </div>
+                  <div class="small text-muted">
+                    {{ appt.slot.start_time|time_fmt }} - {{ appt.slot.end_time|time_fmt }}
+                  </div>
+                {% elif appt.rescheduled_date %}
+                  <div class="fw-semibold text-warning">
+                    <i class="bi bi-arrow-repeat me-1"></i> Rescheduled:
+                  </div>
+                  <div class="small text-dark">
+                    {{ appt.rescheduled_date|date_fmt }} at {{ appt.rescheduled_start_time|time_fmt }}-{{ appt.rescheduled_end_time|time_fmt }}
+                  </div>
+                {% else %}
+                  <span class="text-muted small">Ad-hoc request</span>
+                {% endif %}
+              </td>
+              <td class="small" style="max-width: 250px;">
+                {{ appt.purpose }}
+                {% if appt.concern %}
+                  <div class="mt-1">
+                    <a href="{{ url_for('staff.view_concern', concern_id=appt.concern.id) }}" class="badge bg-light text-primary border text-decoration-none">
+                      Ref: #{{ appt.concern.tracking_number }}
+                    </a>
+                  </div>
+                {% endif %}
+              </td>
+              <td>
+                {% if appt.status == 'Approved' %}
+                  <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Approved</span>
+                {% elif appt.status == 'Declined' %}
+                  <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i> Declined</span>
+                {% elif appt.status == 'Rescheduled' %}
+                  <span class="badge bg-warning text-dark"><i class="bi bi-arrow-repeat me-1"></i> Rescheduled</span>
+                {% elif appt.status == 'Completed' %}
+                  <span class="badge bg-secondary"><i class="bi bi-check-all me-1"></i> Completed</span>
+                {% else %}
+                  <span class="badge bg-primary"><i class="bi bi-hourglass me-1"></i> Requested</span>
+                {% endif %}
+              </td>
+              <td>
+                <button type="button" class="btn btn-sm btn-outline-primary py-1 px-3" data-bs-toggle="modal" data-bs-target="#actionModal{{ appt.id }}">
+                  Action
+                </button>
+
+                <!-- Modal for Appointment Action -->
+                <div class="modal fade" id="actionModal{{ appt.id }}" tabindex="-1">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title fw-bold">Respond to Appointment #{{ appt.id }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                      </div>
+                      <form method="POST" action="{{ url_for('staff.appointment_action', appointment_id=appt.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="modal-body text-start">
+                          <p class="small text-muted mb-3">
+                            Student: <strong>{{ appt.student.name }}</strong> &bull; Purpose: <em>{{ appt.purpose }}</em>
+                          </p>
+
+                          <div class="mb-3">
+                            <label class="form-label small fw-semibold">Action</label>
+                            <select name="action" class="form-select action-select" data-modal-id="{{ appt.id }}" required>
+                              <option value="Approved" {% if appt.status == 'Approved' %}selected{% endif %}>Approve Request</option>
+                              <option value="Declined" {% if appt.status == 'Declined' %}selected{% endif %}>Decline Request</option>
+                              <option value="Rescheduled" {% if appt.status == 'Rescheduled' %}selected{% endif %}>Reschedule / Propose New Time</option>
+                              <option value="Completed" {% if appt.status == 'Completed' %}selected{% endif %}>Mark Completed</option>
+                            </select>
+                          </div>
+
+                          <div class="mb-3">
+                            <label class="form-label small fw-semibold">Staff Notes (Visible to Student)</label>
+                            <textarea name="notes" class="form-control" rows="2" placeholder="e.g. Please bring registration slip...">{{ appt.staff_notes or '' }}</textarea>
+                          </div>
+
+                          <div id="reschedule-group-{{ appt.id }}" class="border rounded p-3 bg-light mb-3 d-none">
+                            <h6 class="fw-bold small text-primary mb-2">Propose New Schedule</h6>
+                            <div class="mb-2">
+                              <label class="form-label small">New Date</label>
+                              <input type="date" name="reschedule_date" class="form-control form-control-sm" value="{{ appt.rescheduled_date.strftime('%Y-%m-%d') if appt.rescheduled_date else '' }}">
+                            </div>
+                            <div class="row g-2 mb-2">
+                              <div class="col-6">
+                                <label class="form-label small">Start Time</label>
+                                <input type="time" name="reschedule_start_time" class="form-control form-control-sm" value="{{ appt.rescheduled_start_time.strftime('%H:%M') if appt.rescheduled_start_time else '' }}">
+                              </div>
+                              <div class="col-6">
+                                <label class="form-label small">End Time</label>
+                                <input type="time" name="reschedule_end_time" class="form-control form-control-sm" value="{{ appt.rescheduled_end_time.strftime('%H:%M') if appt.rescheduled_end_time else '' }}">
+                              </div>
+                            </div>
+                            <div class="mb-0">
+                              <label class="form-label small">Location</label>
+                              <input type="text" name="reschedule_location" class="form-control form-control-sm" value="{{ appt.rescheduled_location or current_user.cabin_location or '' }}" placeholder="e.g. Cabin 204">
+                            </div>
+                          </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                          <button type="submit" class="btn btn-primary btn-sm px-4">Submit Action</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% else %}
+  <div class="card p-5 text-center border-0 shadow-sm rounded-4">
+    <i class="bi bi-calendar-x text-muted fs-1 mb-2"></i>
+    <h5 class="text-muted">No appointment requests received yet.</h5>
+    <p class="small text-muted mb-0">Publish availability slots to help students find available times to meet.</p>
+  </div>
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.querySelectorAll('.action-select').forEach(select => {
+    function toggleModalReschedule() {
+      const modalId = select.dataset.modalId;
+      const container = document.getElementById(`reschedule-group-${modalId}`);
+      if (container) {
+        if (select.value === 'Rescheduled') {
+          container.classList.remove('d-none');
+        } else {
+          container.classList.add('d-none');
+        }
+      }
+    }
+    select.addEventListener('change', toggleModalReschedule);
+    toggleModalReschedule();
+  });
+</script>
+{% endblock %}

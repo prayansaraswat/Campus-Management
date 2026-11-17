@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Sign In - Campus Portal{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+  <div class="col-md-6 col-lg-5">
+    <div class="card border-0 shadow-lg rounded-4 p-4 p-md-5 bg-white">
+      <div class="text-center mb-4">
+        <div class="display-6 text-primary mb-2">
+          <i class="bi bi-shield-lock-fill"></i>
+        </div>
+        <h3 class="fw-bold text-dark">Portal Sign In</h3>
+        <p class="text-muted small">Access your concerns, dashboard, or administrative queue.</p>
+      </div>
+
+      <form method="POST" action="{{ url_for('auth.login', next=request.args.get('next')) }}">
+        {{ form.hidden_tag() }}
+
+        <div class="mb-3">
+          {{ form.email.label(class="form-label fw-semibold small") }}
+          {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), id="login-email") }}
+          {% for error in form.email.errors %}
+            <div class="invalid-feedback">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="mb-3">
+          {{ form.password.label(class="form-label fw-semibold small") }}
+          {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), id="login-password") }}
+          {% for error in form.password.errors %}
+            <div class="invalid-feedback">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="d-grid mb-3">
+          {{ form.submit(class="btn btn-primary py-2 fw-semibold") }}
+        </div>
+      </form>
+
+      <div class="text-center small text-muted border-top pt-3">
+        Are you a student without an account? 
+        <a href="{{ url_for('auth.register') }}" class="fw-semibold text-primary">Register here</a>
+      </div>
+
+      <!-- Quick Demo Login Helper -->
+      <div class="mt-4 pt-3 border-top">
+        <div class="small fw-bold text-uppercase text-secondary mb-2">Quick Demo Accounts (Click to Fill):</div>
+        <div class="d-flex flex-wrap gap-1">
+          <button type="button" class="btn btn-outline-secondary btn-xs py-1 px-2 small demo-filler" data-email="student@campus.edu">Student</button>
+          <button type="button" class="btn btn-outline-secondary btn-xs py-1 px-2 small demo-filler" data-email="mentor@campus.edu">Mentor</button>
+          <button type="button" class="btn btn-outline-secondary btn-xs py-1 px-2 small demo-filler" data-email="coordinator@campus.edu">Coordinator</button>
+          <button type="button" class="btn btn-outline-secondary btn-xs py-1 px-2 small demo-filler" data-email="warden@campus.edu">Warden</button>
+          <button type="button" class="btn btn-outline-secondary btn-xs py-1 px-2 small demo-filler" data-email="wellbeing@campus.edu">Wellbeing Staff</button>
+          <button type="button" class="btn btn-outline-secondary btn-xs py-1 px-2 small demo-filler" data-email="dean_sa@campus.edu">Dean SA</button>
+          <button type="button" class="btn btn-outline-secondary btn-xs py-1 px-2 small demo-filler" data-email="admin@campus.edu">Admin</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.querySelectorAll('.demo-filler').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.getElementById('login-email').value = this.dataset.email;
+      document.getElementById('login-password').value = 'Password123!';
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Manage Routing Rules - Campus Portal{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+  <div class="col-md-8">
+    <h3 class="fw-bold mb-1"><i class="bi bi-signpost-split-fill text-primary me-2"></i> Database Routing Table</h3>
+    <p class="text-muted small mb-0">
+      Configure which university roles receive newly submitted concerns per category. Routes are fully dynamic and read from the database.
+    </p>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Create / Edit Form -->
+  <div class="col-lg-5">
+    <div class="card shadow-sm border-0 rounded-4 p-4 bg-white">
+      <h5 class="fw-bold text-dark mb-3"><i class="bi bi-plus-circle-fill text-primary me-2"></i> Add / Update Routing Rule</h5>
+
+      <form method="POST" action="{{ url_for('admin.routing_rules') }}">
+        {{ form.hidden_tag() }}
+
+        <div class="mb-3">
+          {{ form.category.label(class="form-label small fw-semibold") }}
+          {{ form.category(class="form-control" + (" is-invalid" if form.category.errors else "")) }}
+          {% for error in form.category.errors %}
+            <div class="invalid-feedback">{{ error }}</div>
+          {% endfor %}
+          <div class="form-text small">e.g. Academic, Mess, Residential, Examination/Results, Wellbeing, Other</div>
+        </div>
+
+        <div class="mb-3">
+          {{ form.target_role.label(class="form-label small fw-semibold") }}
+          {{ form.target_role(class="form-select" + (" is-invalid" if form.target_role.errors else "")) }}
+          {% for error in form.target_role.errors %}
+            <div class="invalid-feedback">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="mb-3">
+          {{ form.description.label(class="form-label small fw-semibold") }}
+          {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else "")) }}
+          {% for error in form.description.errors %}
+            <div class="invalid-feedback">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="form-check form-switch mb-4">
+          {{ form.is_active(class="form-check-input", id="ruleActiveSwitch") }}
+          {{ form.is_active.label(class="form-check-label small fw-semibold", for="ruleActiveSwitch") }}
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 fw-semibold">
+          <i class="bi bi-save me-1"></i> Save Routing Rule
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Routing Table Listing -->
+  <div class="col-lg-7">
+    <div class="card shadow-sm border-0 rounded-4 bg-white">
+      <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0 text-dark">Active Database Routes</h5>
+        <span class="badge bg-light text-dark border">{{ rules|length }} Rules</span>
+      </div>
+      <div class="card-body p-0">
+        {% if rules %}
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light small">
+                <tr>
+                  <th>Category</th>
+                  <th>Target Role</th>
+                  <th>Description</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for rule in rules %}
+                  <tr>
+                    <td>
+                      <strong class="text-dark">{{ rule.category }}</strong>
+                    </td>
+                    <td>
+                      <span class="badge bg-primary">{{ rule.target_role }}</span>
+                    </td>
+                    <td class="small text-muted">{{ rule.description or '-' }}</td>
+                    <td>
+                      {% if rule.is_active %}
+                        <span class="badge bg-success">Active</span>
+                      {% else %}
+                        <span class="badge bg-secondary">Disabled</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <form method="POST" action="{{ url_for('admin.delete_routing_rule', rule_id=rule.id) }}" class="d-inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-outline-danger btn-xs py-0 px-2 small" onclick="return confirm('Delete this routing rule?');">
+                          Delete
+                        </button>
+                      </form>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="text-center py-5">
+            <i class="bi bi-signpost text-muted fs-1 mb-2"></i>
+            <h6 class="text-muted">No routing rules configured.</h6>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

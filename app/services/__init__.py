@@ -1,0 +1,53 @@
+from app.services.notification_service import (
+    create_notification,
+    notify_role,
+    get_user_notifications,
+    get_unread_count,
+    mark_notification_read,
+    mark_all_notifications_read,
+)
+from app.services.concern_service import (
+    create_concern,
+    get_concern_by_id,
+    check_concern_access,
+    update_concern_status,
+    escalate_concern,
+    add_concern_comment,
+    get_student_concerns,
+    get_staff_queue,
+    get_admin_dashboard_metrics,
+)
+from app.services.appointment_service import (
+    create_slot,
+    delete_slot,
+    request_appointment,
+    update_appointment_status,
+    get_student_appointments,
+    get_staff_appointments,
+    get_staff_slots,
+)
+
+__all__ = [
+    "create_notification",
+    "notify_role",
+    "get_user_notifications",
+    "get_unread_count",
+    "mark_notification_read",
+    "mark_all_notifications_read",
+    "create_concern",
+    "get_concern_by_id",
+    "check_concern_access",
+    "update_concern_status",
+    "escalate_concern",
+    "add_concern_comment",
+    "get_student_concerns",
+    "get_staff_queue",
+    "get_admin_dashboard_metrics",
+    "create_slot",
+    "delete_slot",
+    "request_appointment",
+    "update_appointment_status",
+    "get_student_appointments",
+    "get_staff_appointments",
+    "get_staff_slots",
+]

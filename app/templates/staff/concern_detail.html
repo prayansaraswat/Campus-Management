@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% block title %}Triage Concern #{{ concern.tracking_number }} - Campus Portal{% endblock %}
+
+{% block content %}
+<div class="row mb-3 align-items-center">
+  <div class="col-md-8">
+    <div class="d-flex align-items-center gap-2">
+      <a href="{{ url_for('staff.queue') }}" class="btn btn-outline-secondary btn-sm me-1">
+        <i class="bi bi-arrow-left"></i>
+      </a>
+      <h3 class="fw-bold mb-0">Concern #{{ concern.tracking_number }}</h3>
+      <span class="badge badge-{{ concern.urgency|lower }}">{{ concern.urgency }} Urgency</span>
+      {% if concern.is_confidential %}
+        <span class="badge bg-purple" style="background-color: #7c3aed; color: #fff;">
+          <i class="bi bi-shield-lock-fill me-1"></i> Confidential Wellbeing
+        </span>
+      {% endif %}
+      {% if concern.is_overdue(overdue_threshold) %}
+        <span class="badge badge-overdue">
+          <i class="bi bi-alarm-fill me-1"></i> Overdue ({{ concern.age_hours }}h unacknowledged)
+        </span>
+      {% endif %}
+    </div>
+  </div>
+  <div class="col-md-4 text-md-end mt-2 mt-md-0">
+    <span class="text-muted small">Submitted {{ concern.created_at|timeago }} &bull; Age: {{ concern.age_hours }}h</span>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Left Side: Concern Content, Status Updates, Escalation -->
+  <div class="col-lg-8">
+    <!-- Concern Overview Card -->
+    <div class="card shadow-sm border-0 rounded-4 p-4 mb-4 bg-white">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <span class="badge bg-light text-dark border">{{ concern.category }}</span>
+          <span class="text-muted small ms-2">Student: <strong>{{ concern.student.name }}</strong> ({{ concern.student.email }})</span>
+        </div>
+        <span class="badge bg-secondary">Current Role: {{ concern.assigned_role }}</span>
+      </div>
+
+      <h4 class="fw-bold text-dark mb-3">{{ concern.title }}</h4>
+      <div class="p-3 bg-light rounded-3 text-muted mb-3" style="white-space: pre-line;">
+        {{ concern.description }}
+      </div>
+
+      <div class="row g-2 small text-muted border-top pt-2">
+        <div class="col-md-4">
+          <strong>Program:</strong> {{ concern.student.department or 'Not specified' }}
+        </div>
+        <div class="col-md-4">
+          <strong>Phone:</strong> {{ concern.student.phone or 'Not provided' }}
+        </div>
+        <div class="col-md-4">
+          <strong>Status:</strong> <span class="badge bg-primary">{{ concern.status }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Triage & Workflow Controls -->
+    <div class="row g-3 mb-4">
+      <!-- Status Update Card -->
+      <div class="col-md-6">
+        <div class="card shadow-sm border-0 rounded-4 p-3 bg-white h-100">
+          <h6 class="fw-bold text-dark mb-2"><i class="bi bi-arrow-repeat text-primary me-1"></i> Update Status</h6>
+          <form method="POST" action="{{ url_for('staff.update_status', concern_id=concern.id) }}">
+            {{ status_form.hidden_tag() }}
+            <div class="mb-2">
+              {{ status_form.status.label(class="form-label small fw-semibold") }}
+              {{ status_form.status(class="form-select form-select-sm") }}
+            </div>
+            <div class="mb-2">
+              {{ status_form.comment.label(class="form-label small fw-semibold") }}
+              {{ status_form.comment(class="form-control form-control-sm", rows="2") }}
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm w-100 fw-semibold">
+              <i class="bi bi-check2-circle me-1"></i> Apply Status Update
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Escalation Card -->
+      <div class="col-md-6">
+        <div class="card shadow-sm border-0 rounded-4 p-3 bg-white h-100">
+          <h6 class="fw-bold text-dark mb-2">
+            <i class="bi bi-arrow-up-right-circle text-warning me-1"></i> Escalate Concern
+          </h6>
+          <div class="small text-muted mb-2">
+            Next Escalation Target: <strong class="text-dark">{{ next_role_preview }}</strong>
+          </div>
+          <form method="POST" action="{{ url_for('staff.escalate', concern_id=concern.id) }}">
+            {{ escalate_form.hidden_tag() }}
+            <div class="mb-2">
+              {{ escalate_form.reason.label(class="form-label small fw-semibold") }}
+              {{ escalate_form.reason(class="form-control form-control-sm", rows="3") }}
+            </div>
+            <button type="submit" class="btn btn-warning text-dark btn-sm w-100 fw-semibold">
+              <i class="bi bi-arrow-up-right me-1"></i> Escalate to Next Authority
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Communication & Comments -->
+    <div class="card shadow-sm border-0 rounded-4 p-4 bg-white mb-4">
+      <h5 class="fw-bold mb-3"><i class="bi bi-chat-left-dots-fill text-primary me-2"></i> Messages & Student Dialogue</h5>
+
+      {% if concern.comments %}
+        <div class="list-group list-group-flush mb-3">
+          {% for comment in concern.comments %}
+            <div class="list-group-item px-0 py-2 border-bottom">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <div>
+                  <strong>{{ comment.author.name }}</strong>
+                  <span class="badge {% if comment.author.is_student %}bg-secondary{% else %}bg-primary{% endif %} ms-1 small">
+                    {{ comment.author.role }}
+                  </span>
+                </div>
+                <small class="text-muted">{{ comment.created_at|timeago }}</small>
+              </div>
+              <p class="mb-0 text-muted small" style="white-space: pre-line;">{{ comment.message }}</p>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="text-muted small mb-3">No comments posted yet.</p>
+      {% endif %}
+
+      <form method="POST" action="{{ url_for('staff.post_comment', concern_id=concern.id) }}">
+        {{ comment_form.hidden_tag() }}
+        <div class="mb-2">
+          {{ comment_form.message.label(class="form-label fw-semibold small") }}
+          {{ comment_form.message(class="form-control form-control-sm", rows="2") }}
+        </div>
+        <button type="submit" class="btn btn-outline-primary btn-sm px-3 fw-semibold">
+          <i class="bi bi-reply-fill me-1"></i> Post Message to Student
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Right Side: Audit Trail Timeline -->
+  <div class="col-lg-4">
+    <div class="card shadow-sm border-0 rounded-4 p-4 bg-white">
+      <h5 class="fw-bold mb-3"><i class="bi bi-clock-history text-secondary me-2"></i> Audit Trail</h5>
+      <div class="activity-stream">
+        {% for event in concern.timeline %}
+          <div class="activity-item">
+            <h6 class="fw-bold mb-0 text-dark small">{{ event.action }}</h6>
+            {% if event.details %}
+              <p class="text-muted small mb-1">{{ event.details }}</p>
+            {% endif %}
+            <div class="text-secondary" style="font-size: 0.75rem;">
+              {{ event.created_at|date_fmt }} at {{ event.created_at|time_fmt }}
+              {% if event.performer %}
+                &bull; {{ event.performer.name }}
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

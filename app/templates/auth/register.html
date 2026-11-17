@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Student Registration - Campus Portal{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+  <div class="col-md-7 col-lg-6">
+    <div class="card border-0 shadow-lg rounded-4 p-4 p-md-5 bg-white">
+      <div class="text-center mb-4">
+        <div class="display-6 text-warning mb-2">
+          <i class="bi bi-person-plus-fill"></i>
+        </div>
+        <h3 class="fw-bold text-dark">Student Account Registration</h3>
+        <p class="text-muted small">Create an account to raise concerns, track resolution, and request appointments.</p>
+      </div>
+
+      <form method="POST" action="{{ url_for('auth.register') }}">
+        {{ form.hidden_tag() }}
+
+        <div class="mb-3">
+          {{ form.name.label(class="form-label fw-semibold small") }}
+          {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else "")) }}
+          {% for error in form.name.errors %}
+            <div class="invalid-feedback">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="mb-3">
+          {{ form.email.label(class="form-label fw-semibold small") }}
+          {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else "")) }}
+          {% for error in form.email.errors %}
+            <div class="invalid-feedback">{{ error }}</div>
+          {% endfor %}
+          <div class="form-text small">Use your university student email address.</div>
+        </div>
+
+        <div class="row g-2 mb-3">
+          <div class="col-md-6">
+            {{ form.department.label(class="form-label fw-semibold small") }}
+            {{ form.department(class="form-control" + (" is-invalid" if form.department.errors else "")) }}
+            {% for error in form.department.errors %}
+              <div class="invalid-feedback">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <div class="col-md-6">
+            {{ form.phone.label(class="form-label fw-semibold small") }}
+            {{ form.phone(class="form-control" + (" is-invalid" if form.phone.errors else "")) }}
+            {% for error in form.phone.errors %}
+              <div class="invalid-feedback">{{ error }}</div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="row g-2 mb-4">
+          <div class="col-md-6">
+            {{ form.password.label(class="form-label fw-semibold small") }}
+            {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else "")) }}
+            {% for error in form.password.errors %}
+              <div class="invalid-feedback">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <div class="col-md-6">
+            {{ form.confirm_password.label(class="form-label fw-semibold small") }}
+            {{ form.confirm_password(class="form-control" + (" is-invalid" if form.confirm_password.errors else "")) }}
+            {% for error in form.confirm_password.errors %}
+              <div class="invalid-feedback">{{ error }}</div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="d-grid mb-3">
+          {{ form.submit(class="btn btn-warning py-2 text-dark fw-bold") }}
+        </div>
+      </form>
+
+      <div class="text-center small text-muted border-top pt-3">
+        Already registered? 
+        <a href="{{ url_for('auth.login') }}" class="fw-semibold text-primary">Sign in here</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
